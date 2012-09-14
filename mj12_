@@ -1,0 +1,145 @@
+#!/bin/bash
+# -*- sh -*-
+
+: << =cut
+
+=head1 NAME
+
+mj12_ - Wildcard-plugin to monitor majestic12 nodes.
+
+=head1 CONFIGURATION
+								      
+This plugin does not normally require configuration but it needs
+xur17's MJ12monitor.jhh, which you can find here:
+https://github.com/xur17/MJ12Monitor/blob/master/MJ12Monitor.jhh
+A copy of this file is located here:
+http://dontrm.org/8212858d1d99b57cdc5f9fb3cc9474c7
+You must put these files into the /htdocs/tools/ directory of your
+majestic12 node to work properly.
+
+If your server does not listens to 127.0.0.1 to port 1088 or your
+username and password are not empty you must specify some
+configuration values as showed in this sample:
+
+  [mj12_1]
+    env.host 127.0.0.1
+    env.port 1088
+    env.user majesticuser
+    env.pass secret
+
+This is a wildcard plugin. To monitor an majestic12 node, link mj12_
+to this file. E.g.
+
+  ln -s /usr/share/munin/plugins/mj12_ /etc/munin/plugins/mj12_1
+
+...will monitor the first specified server.
+
+=head1 AUTHOR
+
+  fusl (Kevin Holly (Dedilink.eu))
+
+=head1 LICENSE
+
+GNU General Public License
+
+=head1 VERSION
+
+  $Id: mj12_.in 1 2012-09-14 20:42:46Z fusl $
+
+=cut
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+NODEID=${0##*/mj12_}
+HOST="${host:-127.0.0.1}"
+PORT="${port:-1088}"
+[ "$user" ] && USERNAME="--http-user=$user"
+[ "$pass" ] && PASSWORD="--http-password=$pass"
+
+case $1 in
+	config)
+	echo "graph_title Majestic12 Stats for $HOST:$PORT (ID $NODEID)"
+	echo "graph_vlabel average x per second"
+	echo "graph_category network"
+	echo "graph_info This graph shows Majestic12 node statistics for $HOST:$PORT (ID $NODEID)"
+	for relatives in totalurls successes notfound timedout disallowed banned dnserrors connerrors forbidden other retries downloadeddata overalldownload uploadeddata overallupload
+	do
+		echo "$relatives.label $relatives"
+		echo "$relatives.type COUNTER"
+	done
+	for absolutes in currentdownload downloadlimit currentupload uploadlimit
+	do
+		echo "$absolutes.label $absolutes"
+		echo "$absolutes.type GAUGE"
+	done
+	;;
+	*)
+		wget -q -O- $USERNAME $PASSWORD http://$HOST:$PORT/tools/MJ12Monitor.jhh | while read line
+		do
+			column="`echo $line | tr -d ' ()' | awk -F':' '{print $1}'`"
+			value="`echo $line | tr -d ' ,' | awk -F':' '{print $2}' | awk -F'(' '{print $1}'`"
+			case $column in
+				TotalURLs)
+					echo "totalurls.value $value"
+				;;
+				Successes)
+					echo "successes.value $value"
+				;;
+				Notfound)
+					echo "notfound.value $value"
+				;;
+				Timedout)
+					echo "timedout.value $value"
+				;;
+				Disallowed)
+					echo "disallowed.value $value"
+				;;
+				Banned)
+					echo "banned.value $value"
+				;;
+				DNSerrors)
+					echo "dnserrors.value $value"
+				;;
+				Connerrors)
+					echo "connerrors.value $value"
+				;;
+				Forbidden403)
+					echo "forbidden.value $value"
+				;;
+				Other)
+					echo "other.value $value"
+				;;
+				Retries)
+					echo "retries.value $value"
+				;;
+				CurrentDownload)
+					echo "currentdownload.value $value"
+				;;
+				OverallDownload)
+					echo "overalldownload.value $value"
+				;;
+				DownloadLimit)
+					echo "downloadlimit.value $value"
+				;;
+				DownloadedData)
+					echo "downloadeddata.value $value"
+				;;
+				CurrentUpload)
+					echo "currentupload.value $value"
+				;;
+				OverallUpload)
+					echo "overallupload.value $value"
+				;;
+				UploadLimit)
+					echo "uploadlimit.value $value"
+				;;
+				UploadedData)
+					echo "uploadeddata.value $value"
+				;;
+				*)
+					continue
+				;;
+			esac
+		done
+	;;
+esac
