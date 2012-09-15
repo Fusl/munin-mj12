@@ -60,7 +60,7 @@ HOST="${host:-127.0.0.1}"
 PORT="${port:-1088}"
 [ "$user" ] && USERNAME="--http-user=$user"
 [ "$pass" ] && PASSWORD="--http-password=$pass"
-relativelist="totalurls successes notfound timedout disallowed banned dnserrors connerrors forbidden403 other retries downloadeddata overalldownload uploadeddata overallupload"
+relativelist="totalurls successes notfound timedout disallowed banned dnserrors connerrors forbidden403 other retries downloadeddata uploadeddata"
 absolutelist="currentdownload downloadlimit currentupload uploadlimit"
 
 case $1 in
