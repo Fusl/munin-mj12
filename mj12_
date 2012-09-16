@@ -49,7 +49,7 @@ GNU General Public License
 
 =head1 VERSION
 
-  $Id: mj12_.in 3 2012-09-16 02:59:15Z fusl $
+  $Id: mj12_.in 4 2012-09-16 03:14:31Z fusl $
 
 =cut
 
@@ -61,7 +61,7 @@ PORT="${port:-1088}"
 [ "$user" ] && USERNAME="--http-user=$user"
 [ "$pass" ] && PASSWORD="--http-password=$pass"
 relativelist="totalurls successes notfound timedout disallowed banned dnserrors connerrors forbidden403 other retries downloadeddata uploadeddata"
-absolutelist="currentdownload downloadlimit currentupload uploadlimit"
+absolutelist="currentdownload currentupload"
 
 case $1 in
 	config)
