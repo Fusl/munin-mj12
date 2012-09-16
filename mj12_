@@ -30,7 +30,7 @@ configuration values as showed in this example:
     env.user  majesticuser
     env.pass  secret
     env.ignore_[field] true
-    env.show [field1]:[type1] [field2]:[type2] [field3]:[ŧype3] [...]:[...]
+    env.show [field1]:[type1] [field2]:[type2] [field3]:[type3] [...]:[...]
 
 The penultimate line of the above example completely hides a statistic
 line from the entire graph.
